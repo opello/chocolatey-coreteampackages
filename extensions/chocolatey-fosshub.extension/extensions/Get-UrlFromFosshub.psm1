@@ -19,6 +19,9 @@ Function Get-UrlFromFosshub($linkUrl) {
   # Get the actual FossHub appname from the matches array
   # From the example above, this would be Audacity.html
   $fosshubAppName = $Matches[1]
+  # Remove genLink from the appname and add the .html suffix if it was passed
+  # into the function.
+  $fosshubAppName = $fosshubAppName -replace '^genLink/(.*)$','$1.html'
 
   # Get the file name from the URL
   # From the example above, this would be audacity-win-2.1.2.exe
@@ -32,10 +35,10 @@ Function Get-UrlFromFosshub($linkUrl) {
   # <a href="/Audacity.html/audacity-win-2.1.2.exe" rel="nofollow" class="dwl-link xlink" file="audacity-win-2.1.2.exe" data="https://download.fosshub.com/Protected/expiretime=1475696791;badurl=aHR0cDovL3d3dy5mb3NzaHViLmNvbS9BdWRhY2l0eS5odG1s/606878a89d0b1e2bf998e0482bf081a451e8d98479d8b246a83d33db1a597538/Audacity/audacity-win-2.1.2.exe">
   $regexPattern = "<a href=`"$hrefText`".*data=`"(.*)`""
 
-  $referer = "https://www.fosshub.com/${fosshubAppName}"
+  $referer = "https://www.fosshub.com/$fosshubAppName/$fosshubFileName"
   $webClient = Get-Downloader $linkUrl $referer
 
-  $htmlPage = $webClient.DownloadString($linkUrl)
+  $htmlPage = $webClient.DownloadString($referer)
 
   $dataLink = $htmlPage -match $regexPattern
 
